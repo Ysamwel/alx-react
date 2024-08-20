@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode production"
   },
   "keywords": [],
   "author": "",
@@ -16,9 +17,6 @@
   "dependencies": {
     "jquery": "^3.7.1",
     "lodash": "^4.17.21"
-  },
-  "scripts": {
-  "build": "webpack --mode production"
-}
+  }
 
 }
