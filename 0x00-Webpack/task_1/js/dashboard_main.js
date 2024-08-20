@@ -15,6 +15,7 @@ const updateCounter = () => {
     });
   };
   
+
   _.debounce(updateCounter, 500);
 updateCounter();
 
