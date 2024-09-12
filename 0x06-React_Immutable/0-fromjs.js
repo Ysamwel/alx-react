@@ -1,6 +1,5 @@
-import { fromJS } from 'immutable';  // Correct import statement
+import { fromJS } from 'immutable';
 
-// Correct function declaration
 export default function getImmutableObject(object) {
-    return fromJS(object);  // Convert object to Immutable.js structure
+  return fromJS(object);
 }
