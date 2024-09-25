@@ -1,4 +1,4 @@
-import { Map } from 'table';
+import { Map } from 'immutable';
 import {
   FETCH_COURSE_SUCCESS,
   SELECT_COURSE,
