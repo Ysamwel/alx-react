@@ -148,4 +148,6 @@ const mapStateToProps = (state) => {
 
 //changing export to connect(mapStateToProps)(App)
 export default connect(mapStateToProps)(App);
+export { mapStateToProps };
+
 

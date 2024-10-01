@@ -3,6 +3,8 @@ import React from 'react';
 import App, { listNotificationsInitialState } from './App';
 import { StyleSheetTestUtils } from 'aphrodite';
 import { user, logOut, AppContext } from './AppContext';
+import { mapStateToProps } from './App';
+import { fromJS } from 'immutable';
 
 describe('<App />', () => {
   beforeAll(() => {
@@ -81,5 +83,16 @@ describe('<App />', () => {
       </AppContext.Provider>
     );
     expect(wrapper.exists());
+  });
+});
+
+
+describe('mapStateToProps', () => {
+  it('should return the correct isLoggedIn value from state', () => {
+    const state = fromJS({
+      isUserLoggedIn: true,
+    });
+    const expectedProps = { isLoggedIn: true };
+    expect(mapStateToProps(state)).toEqual(expectedProps);
   });
 });
