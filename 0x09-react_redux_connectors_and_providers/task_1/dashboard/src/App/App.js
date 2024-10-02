@@ -76,7 +76,7 @@ class App extends Component {
 
   render() {
     const { user, user: { isLoggedIn }, logOut, listNotifications } = this.state;
-    const { displayDrawer, displayNotificationDrawer, hideNotificationDrawer } = this.props; // Using Redux props
+    const { displayDrawer, displayNotificationDrawer, hideNotificationDrawer } = this.props; // Redux props
     const value = { user, logOut };
 
     return (
@@ -111,12 +111,16 @@ class App extends Component {
   }
 }
 
-App.defaultProps = {};
-
+// Define propTypes for the new props passed from Redux
 App.propTypes = {
-  displayNotificationDrawer: PropTypes.func.isRequired, // Redux action prop
-  hideNotificationDrawer: PropTypes.func.isRequired, // Redux action prop
-  displayDrawer: PropTypes.bool.isRequired, // Redux state prop
+  displayNotificationDrawer: PropTypes.func.isRequired,
+  hideNotificationDrawer: PropTypes.func.isRequired,
+  displayDrawer: PropTypes.bool.isRequired,
+};
+
+// Define defaultProps in case props are not passed
+App.defaultProps = {
+  displayDrawer: false,
 };
 
 const styles = StyleSheet.create({
@@ -133,17 +137,17 @@ const styles = StyleSheet.create({
   },
 });
 
-// mapStateToProps function
+// mapStateToProps function to retrieve Redux state
 const mapStateToProps = (state) => ({
   isLoggedIn: state.ui.isLoggedIn,
   displayDrawer: state.ui.isNotificationDrawerVisible,
 });
 
-// Simplified mapDispatchToProps
+// mapDispatchToProps using the simplified version
 const mapDispatchToProps = {
   displayNotificationDrawer,
   hideNotificationDrawer,
 };
 
-// changing export to connect(mapStateToProps, mapDispatchToProps)(App)
+// Connecting the component to Redux
 export default connect(mapStateToProps, mapDispatchToProps)(App);
