@@ -11,7 +11,7 @@ import { getLatestNotification } from '../utils/utils';
 import { StyleSheet, css } from 'aphrodite';
 import { user, logOut, AppContext } from './AppContext';
 import { connect } from 'react-redux';
-import { displayNotificationDrawer, hideNotificationDrawer } from '../actions/uiActions'; // Assuming you have these actions
+import { displayNotificationDrawer, hideNotificationDrawer } from '../actions/uiActions';
 
 const listCourses = [
   { id: 1, name: 'ES6', credit: 60 },
@@ -76,16 +76,16 @@ class App extends Component {
 
   render() {
     const { user, user: { isLoggedIn }, logOut, listNotifications } = this.state;
-    const { displayDrawer, handleDisplayDrawer, handleHideDrawer } = this.props; // Accessing from props now
+    const { displayDrawer, displayNotificationDrawer, hideNotificationDrawer } = this.props; // Using Redux props
     const value = { user, logOut };
 
     return (
       <AppContext.Provider value={value}>
         <Notifications
           listNotifications={listNotifications}
-          displayDrawer={displayDrawer} // From Redux props
-          handleDisplayDrawer={handleDisplayDrawer} // From Redux action
-          handleHideDrawer={handleHideDrawer} // From Redux action
+          displayDrawer={displayDrawer} // Redux prop
+          handleDisplayDrawer={displayNotificationDrawer} // Redux action passed as prop
+          handleHideDrawer={hideNotificationDrawer} // Redux action passed as prop
           markNotificationAsRead={this.markNotificationAsRead}
         />
         <Header />
@@ -113,7 +113,11 @@ class App extends Component {
 
 App.defaultProps = {};
 
-App.propTypes = {};
+App.propTypes = {
+  displayNotificationDrawer: PropTypes.func.isRequired, // Redux action prop
+  hideNotificationDrawer: PropTypes.func.isRequired, // Redux action prop
+  displayDrawer: PropTypes.bool.isRequired, // Redux state prop
+};
 
 const styles = StyleSheet.create({
   footer: {
@@ -135,12 +139,11 @@ const mapStateToProps = (state) => ({
   displayDrawer: state.ui.isNotificationDrawerVisible,
 });
 
-// mapDispatchToProps function
-const mapDispatchToProps = (dispatch) => ({
-  handleDisplayDrawer: () => dispatch(displayNotificationDrawer()),
-  handleHideDrawer: () => dispatch(hideNotificationDrawer()),
-});
+// Simplified mapDispatchToProps
+const mapDispatchToProps = {
+  displayNotificationDrawer,
+  hideNotificationDrawer,
+};
 
 // changing export to connect(mapStateToProps, mapDispatchToProps)(App)
 export default connect(mapStateToProps, mapDispatchToProps)(App);
-export { mapStateToProps };
