@@ -2,7 +2,7 @@ import { shallow } from 'enzyme';
 import React from 'react';
 import App, { listNotificationsInitialState } from './App';
 import { StyleSheetTestUtils } from 'aphrodite';
-import { user, logOut, AppContext } from './AppContext';
+import { AppContext } from './AppContext'; // No need for user and logOut context anymore
 import { mapStateToProps } from './App';
 import { fromJS } from 'immutable';
 
@@ -10,6 +10,7 @@ describe('<App />', () => {
   beforeAll(() => {
     StyleSheetTestUtils.suppressStyleInjection();
   });
+
   afterAll(() => {
     StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
   });
@@ -53,22 +54,19 @@ describe('<App />', () => {
     const logOut = jest.fn();
     const wrapper = shallow(<App logOut={logOut} />);
     const alert = jest.spyOn(global, 'alert').mockImplementation(() => {});
-    
+
     const event = new KeyboardEvent('keydown', { key: 'h', ctrlKey: true });
     window.dispatchEvent(event);
 
     expect(alert).toHaveBeenCalledWith('Logging you out');
     expect(logOut).toHaveBeenCalled();
-    
+
     alert.mockRestore();
   });
 
-  // No need to test handleDisplayDrawer and handleHideDrawer
-  // As these are handled via Redux and not part of App's local state anymore
-
   it('<AppContext.Provider /> renders correctly', () => {
     const wrapper = shallow(
-      <AppContext.Provider value={{ user, logOut }}>
+      <AppContext.Provider value={{ user: null, logOut: () => {} }}>
         <App />
       </AppContext.Provider>
     );

@@ -9,9 +9,9 @@ import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBot
 import PropTypes from 'prop-types';
 import { getLatestNotification } from '../utils/utils';
 import { StyleSheet, css } from 'aphrodite';
-import { user, logOut, AppContext } from './AppContext';
+import { AppContext } from './AppContext';
 import { connect } from 'react-redux';
-import { displayNotificationDrawer, hideNotificationDrawer } from '../actions/uiActions';
+import { displayNotificationDrawer, hideNotificationDrawer, loginRequest, logout } from '../actions/uiActions';
 
 const listCourses = [
   { id: 1, name: 'ES6', credit: 60 },
@@ -29,12 +29,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.handleLogout = this.handleLogout.bind(this);
-    this.logIn = this.logIn.bind(this);
-    this.logOut = this.logOut.bind(this);
     this.markNotificationAsRead = this.markNotificationAsRead.bind(this);
     this.state = {
-      user,
-      logOut: this.logOut,
       listNotifications: listNotificationsInitialState,
     };
   }
@@ -50,22 +46,8 @@ class App extends Component {
   handleLogout(e) {
     if (e.key === 'h' && e.ctrlKey) {
       alert('Logging you out');
-      this.state.logOut();
+      this.props.logout(); // Use the Redux action for logout
     }
-  }
-
-  logIn(email, password) {
-    this.setState({
-      user: {
-        email,
-        password,
-        isLoggedIn: true,
-      },
-    });
-  }
-
-  logOut() {
-    this.setState({ user });
   }
 
   markNotificationAsRead(id) {
@@ -75,14 +57,13 @@ class App extends Component {
   }
 
   render() {
-    const { user, user: { isLoggedIn }, logOut, listNotifications } = this.state;
-    const { displayDrawer, displayNotificationDrawer, hideNotificationDrawer } = this.props; // Redux props
-    const value = { user, logOut };
+    const { user, isLoggedIn, displayDrawer, displayNotificationDrawer, hideNotificationDrawer, loginRequest, logout } = this.props;
+    const value = { user, logOut: logout };
 
     return (
       <AppContext.Provider value={value}>
         <Notifications
-          listNotifications={listNotifications}
+          listNotifications={this.state.listNotifications}
           displayDrawer={displayDrawer} // Redux prop
           handleDisplayDrawer={displayNotificationDrawer} // Redux action passed as prop
           handleHideDrawer={hideNotificationDrawer} // Redux action passed as prop
@@ -95,7 +76,7 @@ class App extends Component {
           </BodySectionWithMarginBottom>
         ) : (
           <BodySectionWithMarginBottom title='Log in to continue'>
-            <Login />
+            <Login login={loginRequest} /> {/* Use loginRequest passed as a prop */}
           </BodySectionWithMarginBottom>
         )}
         <BodySection title='News from the School'>
@@ -111,18 +92,20 @@ class App extends Component {
   }
 }
 
-// Define propTypes for the new props passed from Redux
 App.propTypes = {
   displayNotificationDrawer: PropTypes.func.isRequired,
   hideNotificationDrawer: PropTypes.func.isRequired,
   displayDrawer: PropTypes.bool.isRequired,
+  loginRequest: PropTypes.func.isRequired,
+  logout: PropTypes.func.isRequired,
+  isLoggedIn: PropTypes.bool.isRequired,
 };
 
-// Define defaultProps in case props are not passed
 App.defaultProps = {
   displayDrawer: false,
 };
 
+// Styling with Aphrodite
 const styles = StyleSheet.create({
   footer: {
     width: '100%',
@@ -139,14 +122,16 @@ const styles = StyleSheet.create({
 
 // mapStateToProps function to retrieve Redux state
 const mapStateToProps = (state) => ({
-  isLoggedIn: state.ui.isLoggedIn,
-  displayDrawer: state.ui.isNotificationDrawerVisible,
+  isLoggedIn: state.isUserLoggedIn, // Adjust according to your state shape
+  displayDrawer: state.isNotificationDrawerVisible,
 });
 
-// mapDispatchToProps using the simplified version
+// mapDispatchToProps connecting Redux actions
 const mapDispatchToProps = {
   displayNotificationDrawer,
   hideNotificationDrawer,
+  loginRequest,
+  logout,
 };
 
 // Connecting the component to Redux
