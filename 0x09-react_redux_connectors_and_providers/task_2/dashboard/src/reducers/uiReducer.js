@@ -11,7 +11,7 @@ import {
 export const initialState = {
   isNotificationDrawerVisible: false,
   isUserLoggedIn: false,
-  user: {},
+  user: null,  // Set initial user state to null
 };
 
 const uiReducer = (state = Map(initialState), action) => {
@@ -28,8 +28,13 @@ const uiReducer = (state = Map(initialState), action) => {
     case LOGIN_FAILURE:
       return state.set('isUserLoggedIn', false);
 
+    case LOGIN:
+      // Set the user passed in the action payload
+      return state.set('user', action.user);
+
     case LOGOUT:
-      return state.set('isUserLoggedIn', false);
+      // Set the user to null when logging out
+      return state.set('isUserLoggedIn', false).set('user', null);
 
     default:
       break;
