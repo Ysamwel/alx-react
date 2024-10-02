@@ -14,85 +14,88 @@ describe('<App />', () => {
     StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
   });
 
-  it('render without crashing', () => {
+  it('renders without crashing', () => {
     const wrapper = shallow(<App />);
-    expect(wrapper.exists());
+    expect(wrapper.exists()).toBe(true);
   });
 
-  it('contain Notifications component', () => {
+  it('contains Notifications component', () => {
     const wrapper = shallow(<App />);
     expect(wrapper.find('Notifications')).toHaveLength(1);
   });
 
-  it('contain Header component', () => {
+  it('contains Header component', () => {
     const wrapper = shallow(<App />);
     expect(wrapper.find('Header')).toHaveLength(1);
   });
 
-  it('contain Login component', () => {
+  it('contains Login component when user is not logged in', () => {
     const wrapper = shallow(<App />);
     expect(wrapper.find('Login')).toHaveLength(1);
   });
 
-  it('contain Footer component', () => {
+  it('contains Footer component', () => {
     const wrapper = shallow(<App />);
     expect(wrapper.find('Footer')).toHaveLength(1);
   });
 
-  it('CourseList', () => {
+  it('does not contain CourseList when user is not logged in', () => {
     const wrapper = shallow(<App />);
     expect(wrapper.find('CourseList')).toHaveLength(0);
   });
 
-  it('logOut', () => {
-    const logOut = jest.fn(() => undefined);
+  it('contains CourseList component when user is logged in', () => {
+    const wrapper = shallow(<App isLoggedIn={true} />);
+    expect(wrapper.find('CourseList')).toHaveLength(1);
+  });
+
+  it('calls logOut and shows alert when ctrl+h is pressed', () => {
+    const logOut = jest.fn();
     const wrapper = shallow(<App logOut={logOut} />);
-    expect(wrapper.exists());
-    const alert = jest.spyOn(global, 'alert');
-    expect(alert);
-    expect(logOut);
-    jest.restoreAllMocks();
+    const alert = jest.spyOn(global, 'alert').mockImplementation(() => {});
+    
+    const event = new KeyboardEvent('keydown', { key: 'h', ctrlKey: true });
+    window.dispatchEvent(event);
+
+    expect(alert).toHaveBeenCalledWith('Logging you out');
+    expect(logOut).toHaveBeenCalled();
+    
+    alert.mockRestore();
   });
 
-  it('default state for displayDrawer is false', () => {
-    const wrapper = shallow(<App />);
-    expect(wrapper.state().displayDrawer).toEqual(false);
-  });
+  // No need to test handleDisplayDrawer and handleHideDrawer
+  // As these are handled via Redux and not part of App's local state anymore
 
-  it('displayDrawer toggle handleDisplayDrawer', () => {
-    const wrapper = shallow(<App />);
-    expect(wrapper.state().displayDrawer).toEqual(false);
-    const instance = wrapper.instance();
-    instance.handleDisplayDrawer();
-    expect(wrapper.state().displayDrawer).toEqual(true);
-  });
-
-  it('displayDrawer toggle handleDisplayDrawer and handleHideDrawer', () => {
-    const wrapper = shallow(<App />);
-    expect(wrapper.state().displayDrawer).toEqual(false);
-    wrapper.instance().handleDisplayDrawer();
-    expect(wrapper.state().displayDrawer).toEqual(true);
-    wrapper.instance().handleHideDrawer();
-    expect(wrapper.state().displayDrawer).toEqual(false);
-  });
-
-  it('<AppContext.Provider />', () => {
+  it('<AppContext.Provider /> renders correctly', () => {
     const wrapper = shallow(
       <AppContext.Provider value={{ user, logOut }}>
         <App />
       </AppContext.Provider>
     );
-    expect(wrapper.exists());
+    expect(wrapper.exists()).toBe(true);
   });
 });
-
 
 describe('mapStateToProps', () => {
   it('should return the correct isLoggedIn value from state', () => {
     const state = fromJS({
-      isUserLoggedIn: true,
+      ui: {
+        isUserLoggedIn: true,
+        isNotificationDrawerVisible: false,
+      },
     });
-    const expectedProps = { isLoggedIn: true };
+    const expectedProps = { isLoggedIn: true, displayDrawer: false };
+    expect(mapStateToProps(state)).toEqual(expectedProps);
+  });
+
+  it('should return the correct displayDrawer value from state', () => {
+    const state = fromJS({
+      ui: {
+        isUserLoggedIn: false,
+        isNotificationDrawerVisible: true,
+      },
+    });
+    const expectedProps = { isLoggedIn: false, displayDrawer: true };
     expect(mapStateToProps(state)).toEqual(expectedProps);
   });
 });
